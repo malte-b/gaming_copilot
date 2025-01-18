@@ -12,6 +12,6 @@ def delete_data_from_pinecone():
     vector_store.delete(delete_all=True)
 
 
-# poetry run python pinecone_deletion.py
+# poetry run python -m scripts.pinecone_deletion
 if __name__ == "__main__":
     delete_data_from_pinecone()

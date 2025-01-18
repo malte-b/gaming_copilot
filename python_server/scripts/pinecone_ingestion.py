@@ -5,6 +5,7 @@ from typing import List
 from langchain_core.documents import Document
 from pinecone import Pinecone
 from langchain_pinecone import PineconeVectorStore
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # -- internal imports
 from config import PINECONE_API_KEY, mistral_embeddings
@@ -26,15 +27,22 @@ def convert_to_documents_no_validation(stardew_data: List[dict]) -> List[Documen
     Takes the raw list of dicts and converts them to LangChain Document objects.
     The 'markdown' field becomes page_content; the 'metadata' field stays as metadata.
     """
+    chunk_size = 3000
+    chunk_overlap = 50
+
     docs = []
     for item in stardew_data:
         # Safely get your fields
         markdown = item.get("markdown", "")
-        metadata = item.get("metadata", {})
-
-        # Create the Document
-        doc = Document(page_content=markdown, metadata=metadata)
-        docs.append(doc)
+        metadata: dict = item.get("metadata", {})
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        splits: List[str] = text_splitter.split_text(text=markdown)
+        for i, text in enumerate(splits):
+            new_metadata = {"chunk_index": i}
+            new_metadata.update(metadata)
+            # Create the Document
+            doc = Document(page_content=text, metadata=new_metadata)
+            docs.append(doc)
     return docs
 
 

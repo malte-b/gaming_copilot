@@ -44,12 +44,21 @@
   flex-direction: column;
 }
 
-.messages-area {
+.messages-container {
   flex: 1 1 0%;
   overflow: auto;
   height: 100%;
   margin-bottom: 60px;
   padding: 40px;
+}
+
+.message-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.reverse {
+  flex-direction: row-reverse;
 }
 
 .message {

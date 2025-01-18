@@ -1,25 +1,20 @@
 # --- external imports
 import json
 from datetime import datetime
-from typing import AsyncIterable
+from typing import AsyncIterable, List
 from fastapi.routing import APIRouter
 from fastapi.responses import StreamingResponse
-from haystack_integrations.document_stores.weaviate import WeaviateDocumentStore, AuthApiKey
-from haystack import Document
-from haystack.components.builders import ChatPromptBuilder
-from haystack_integrations.components.embedders.mistral import MistralTextEmbedder
-from haystack_integrations.components.retrievers.weaviate import WeaviateEmbeddingRetriever
-from haystack_integrations.components.generators.mistral import MistralChatGenerator
-from haystack import Pipeline
-from haystack.dataclasses import ChatMessage
 from dotenv import load_dotenv
+from langchain_core.documents.base import Document
 from langchain_core.runnables import RunnableParallel
 from operator import itemgetter
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from pinecone import Pinecone
+from langchain_pinecone import PineconeVectorStore
 
 # --- internal imports
-from config import TIMEZONE, DELIMITER, WEAVIATE_URL, mistral_small
+from config import TIMEZONE, DELIMITER, mistral_small, mistral_embeddings, PINECONE_API_KEY
 from api.api_models import PromptInput
 
 router = APIRouter()
@@ -28,6 +23,23 @@ load_dotenv()
 
 
 async def generate_response(prompt_input: PromptInput) -> AsyncIterable[str]:
+    # RETRIEVAL
+    pc = Pinecone(api_key=PINECONE_API_KEY)
+    index = pc.Index(name="gaming-copilot", host="https://gaming-copilot-mipa415.svc.aped-4627-b74a.pinecone.io")
+    vector_store = PineconeVectorStore(index=index, embedding=mistral_embeddings)
+    retrieved_documents: List[Document] = vector_store.similarity_search(
+        query=prompt_input.user_message,
+        k=3,
+        # filter={"source": "tweet"},
+    )
+    print(
+        f"""
+          Retrieved documents: 
+          {retrieved_documents}
+          """
+    )
+
+    # GENERATION
     simple_rag_prompt = ChatPromptTemplate(
         [
             (
@@ -50,7 +62,7 @@ async def generate_response(prompt_input: PromptInput) -> AsyncIterable[str]:
         | StrOutputParser()
     )
     ai_msg = string_output_rag_runnable.invoke(
-        input={"name": "Gaming Companion", "context": "Davids birthday is the 18th of July 1997", "user_message": prompt_input.user_message}
+        input={"name": "Gaming Companion", "context": retrieved_documents, "user_message": prompt_input.user_message}
     )
 
     # 1) onStart event

@@ -17,6 +17,10 @@ python-dotenv = "^1.0.1"
 weaviate-haystack = "^4.0.2"
 haystack-ai = "^2.9.0"
 mistral-haystack = "^0.0.2"
+langchain-community = "^0.3.14"
+weaviate-client = "^4.10.4"
+pinecone = "^5.4.2"
+langchain-pinecone = "^0.2.2"
 
 
 [build-system]

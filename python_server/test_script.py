@@ -4,7 +4,7 @@ import markdown2
 import tempfile
 import webbrowser
 
-# poetry run -m test_script
+
 def main():
     url = "http://127.0.0.1:5000/generate-response-endpoint/"
     payload = {"user_message": "Hello from my script!"}
@@ -15,20 +15,29 @@ def main():
     # 1) Stream the response in real time, print the events to console
     with requests.post(url, json=payload, stream=True) as response:
         response.raise_for_status()
-
         print("Streaming Markdown in real time...\n")
 
         for line in response.iter_lines(decode_unicode=True):
+            print(f"Received line: {line}")
+
             if not line:
+                # Skip empty lines
                 continue
 
+            # SSE lines come in the format: data: {"type":"...", "content":"..."}---END OF EVENT---
             if line.startswith("data: "):
-                data_str = line[len("data: "):]  # remove "data: "
+                # Remove the "data: " prefix
+                data_str = line[len("data: ") :]
+
+                # Strip off the trailing marker ---END OF EVENT---
+                data_str = data_str.replace("---END OF EVENT---", "").strip()
+
                 try:
                     event = json.loads(data_str)
                     event_type = event.get("type")
                     content = event.get("content")
 
+                    # Depending on event type, handle the content
                     if event_type == "onTextToken":
                         print("MD Text:", content)
                         markdown_parts.append(content)
@@ -41,9 +50,10 @@ def main():
                     else:
                         # onStart, onEnd, or other event types
                         print(f"{event_type}:", content)
-                        # Optionally store them, but not required
+                        # Optionally store them as well, if desired
+
                 except json.JSONDecodeError:
-                    pass
+                    print("Could not parse JSON from line:", data_str)
 
     # 2) After streaming finishes, combine everything into one Markdown string
     combined_markdown = "\n\n".join(markdown_parts)
@@ -58,6 +68,7 @@ def main():
 
     webbrowser.open(f"file://{temp_html_path}")
     print("\nDone! A rendered Markdown preview should now open in your browser.")
+
 
 if __name__ == "__main__":
     main()

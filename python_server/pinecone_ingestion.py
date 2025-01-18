@@ -2,7 +2,7 @@ from pinecone import Pinecone
 from langchain_pinecone import PineconeVectorStore
 from langchain_core.documents import Document
 from uuid import uuid4
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, RootModel
 import json
 
@@ -12,7 +12,7 @@ from config import PINECONE_API_KEY, mistral_embeddings
 
 class Metadata(BaseModel):
     title: str
-    category: str
+    category: Optional[str]
 
 
 class PageData(BaseModel):
@@ -57,12 +57,12 @@ def ingest_data_into_pinecone():
     index = pc.Index(name="gaming-copilot", host="https://gaming-copilot-mipa415.svc.aped-4627-b74a.pinecone.io")
     vector_store = PineconeVectorStore(index=index, embedding=mistral_embeddings)
 
-    stardew_pages = read_and_validate_stardew_pages("dummy_data.json")
+    stardew_pages = read_and_validate_stardew_pages("wiki_json.json")
     documents = convert_stardew_pages_to_documents(stardew_pages)
     uuids = [str(uuid4()) for _ in range(len(documents))]
     print(f"Adding {len(documents)} documents.")
     vector_store.add_documents(documents=documents, ids=uuids)
 
-
+# poetry run python pinecone_ingestion.py
 if __name__ == "__main__":
     ingest_data_into_pinecone()

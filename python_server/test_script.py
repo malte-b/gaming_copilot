@@ -38,7 +38,7 @@ def main():
                     content = event.get("content")
 
                     # Depending on event type, handle the content
-                    if event_type == "onTextToken":
+                    if event_type == "onText":
                         print("MD Text:", content)
                         markdown_parts.append(content)
 

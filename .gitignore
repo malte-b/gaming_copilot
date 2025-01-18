@@ -174,3 +174,4 @@ cython_debug/
 *.txt
 *.zip
 *.html
+*.json

@@ -14,6 +14,9 @@ uvicorn = "^0.34.0"
 requests = "^2.32.3"
 markdown2 = "^2.5.2"
 python-dotenv = "^1.0.1"
+weaviate-haystack = "^4.0.2"
+haystack-ai = "^2.9.0"
+mistral-haystack = "^0.0.2"
 
 
 [build-system]

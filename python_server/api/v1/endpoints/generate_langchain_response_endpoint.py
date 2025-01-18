@@ -75,7 +75,7 @@ async def generate_response(prompt_input: PromptInput) -> AsyncIterable[str]:
     yield f"data: {json.dumps({'type': 'onEnd', 'content': 'Stream has ended.', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 
 
-@router.post("/generate-response-endpoint/")
+@router.post("/generate-langchain-response-endpoint/")
 async def generate_response_handler(body: PromptInput) -> StreamingResponse:
     generator = generate_response(prompt_input=body)
     return StreamingResponse(content=generator, media_type="text/event-stream")

@@ -12,3 +12,5 @@ berlin_tz = pytz.timezone("Europe/Berlin")
 TIMEZONE = berlin_tz
 
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+WEAVIATE_API_KEY = os.getenv("WEAVIATE_API_KEY")
+WEAVIATE_URL = os.getenv("WEAVIATE_URL")

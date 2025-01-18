@@ -1,0 +1,39 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  background-color: var(--primary);
+  justify-content: space-between;
+  padding-block: 20px;
+  padding-inline: 40px;
+}
+
+.bot-icon {
+  color: white;
+  width: 40px;
+  height: 40px;
+}
+
+.minimize-btn {
+  border: none;
+  outline: none;
+  color: white;
+  background: transparent;
+  border-radius: 5px;
+}
+
+.minimize-btn svg {
+  width: 35px;
+  height: 35px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.minimize-btn:hover {
+  background-color: var(--white-hover);
+}

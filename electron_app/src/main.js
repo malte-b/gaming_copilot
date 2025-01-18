@@ -42,9 +42,6 @@ function createWindow() {
         }
     })
     inputWindow.loadFile(path.join(__dirname, "windows", "input.html"));
-
-
-    // bubbleWindow.webContents.openDevTools({ mode: 'detach' })
 }
 
 app.whenReady().then(() => {
@@ -54,6 +51,13 @@ app.whenReady().then(() => {
     ipcMain.on(IPC_EVENTS.TRIGGER_INPUT_WINDOW, () => {
         bubbleWindow.hide()
         inputWindow.show()
+        // inputWindow.webContents.openDevTools({ mode: 'detach' })
+    })
+
+    /** Handling the event when user clicks on the minimize button */
+    ipcMain.on(IPC_EVENTS.MINIMIZE, () => {
+        inputWindow.hide()
+        bubbleWindow.show()
     })
 
     app.on("activate", () => {

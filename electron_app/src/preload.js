@@ -8,5 +8,8 @@ const { IPC_EVENTS } = require('./utils/events')
 contextBridge.exposeInMainWorld('electron', {
     goToInputWindow: () => {
         ipcRenderer.send(IPC_EVENTS.TRIGGER_INPUT_WINDOW)
+    },
+    minimize: () => {
+        ipcRenderer.send(IPC_EVENTS.MINIMIZE)
     }
 })

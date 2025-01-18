@@ -175,3 +175,6 @@ cython_debug/
 *.zip
 *.html
 *.json
+*.png
+*.jpeg
+*.jpg

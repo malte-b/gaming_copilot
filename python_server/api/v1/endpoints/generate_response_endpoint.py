@@ -5,9 +5,12 @@ from typing import AsyncIterable
 from fastapi.routing import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from pydantic_ai import Agent
+from pydantic_ai.models.mistral import MistralModel
+
 
 # --- internal imports
-from config import TIMEZONE, DELIMITER
+from config import TIMEZONE, DELIMITER, MISTRAL_API_KEY
 
 router = APIRouter()
 
@@ -17,18 +20,21 @@ class PromptInput(BaseModel):
 
 
 async def generate_response(prompt_input: PromptInput) -> AsyncIterable[str]:
+    print("Response generation started...")
+    model = MistralModel("mistral-small-latest", api_key=MISTRAL_API_KEY)
+    agent = Agent(model)
+
     # 1) onStart event
     yield f"data: {json.dumps({'type': 'onStart', 'content': 'Stream is starting!', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
-    
-    # 2) onTextToken event with markdown
-    yield f"data: {json.dumps({'type': 'onTextToken', 'content': '### This is a sample **Markdown** text', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
-    
+
+    # 2) running a simple LLM inference via pydantic_ai
+    async with agent.run_stream(prompt_input.user_message) as result:
+        async for token in result.stream_text(delta=True):
+            yield f"data: {json.dumps({'type': 'onTextToken', 'content': token, 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+
     # 3) onImageUrl event
     yield f"data: {json.dumps({'type': 'onImageUrl', 'content': 'https://stardewvalleywiki.com/mediawiki/images/a/af/Horse_rider.png', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
-        
-    # 4) onTextToken event with more markdown
-    yield f"data: {json.dumps({'type': 'onTextToken', 'content': 'Here is another piece of **markdown** text!', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
-    
+
     # 5) onEnd event
     yield f"data: {json.dumps({'type': 'onEnd', 'content': 'Stream has ended.', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 

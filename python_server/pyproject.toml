@@ -11,6 +11,10 @@ fastapi = "^0.115.6"
 pydantic = "^2.10.5"
 pytz = "^2024.2"
 uvicorn = "^0.34.0"
+requests = "^2.32.3"
+markdown2 = "^2.5.2"
+python-dotenv = "^1.0.1"
+pydantic-ai = "^0.0.19"
 
 
 [build-system]

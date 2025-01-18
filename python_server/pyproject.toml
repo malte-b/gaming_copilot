@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "python-server"
+version = "0.1.0"
+description = "Python server for the gaming copilot."
+authors = ["David Klueners <davidklueners@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

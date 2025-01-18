@@ -170,7 +170,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-.xml
-.txt
-.zip
-.html
+*.xml
+*.txt
+*.zip
+*.html

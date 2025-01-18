@@ -6,8 +6,8 @@ import webbrowser
 
 
 def main():
-    url = "http://127.0.0.1:5000/generate-response-endpoint/"
-    payload = {"user_message": "Hello from my script!"}
+    url = "http://127.0.0.1:5000/generate-langchain-response-endpoint/"
+    payload = {"user_message": "What can you tell me about the Big Chest?"}
 
     # We'll collect all markdown pieces here so we can show a final rendered version later
     markdown_parts = []
@@ -38,7 +38,7 @@ def main():
                     content = event.get("content")
 
                     # Depending on event type, handle the content
-                    if event_type == "onTextToken":
+                    if event_type == "onText":
                         print("MD Text:", content)
                         markdown_parts.append(content)
 

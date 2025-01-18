@@ -17,6 +17,13 @@ document.getElementById('input-form').addEventListener('submit', event => {
     event.target.reset()
 })
 
+/**
+ * Handling the screenshot button
+ */
+document.getElementById('screenshot').addEventListener('click', event => {
+    window.electron.screenshot()
+})
+
 function appendMessage(message, by) {
     // Creating outer div of message
     const messageWrapperDiv = document.createElement('div')

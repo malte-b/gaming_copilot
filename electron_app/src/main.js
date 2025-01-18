@@ -61,6 +61,11 @@ app.whenReady().then(() => {
         bubbleWindow.show()
     })
 
+    /** Handling screenshot */
+    ipcMain.on(IPC_EVENTS.SCREENSHOT, () => {
+        console.log("I will handle it.")
+    })
+
     app.on("activate", () => {
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();

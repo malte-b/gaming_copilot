@@ -19,7 +19,13 @@
   height: 40px;
 }
 
-.minimize-btn {
+.flex {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
   border: none;
   outline: none;
   color: white;
@@ -27,14 +33,14 @@
   border-radius: 5px;
 }
 
-.minimize-btn svg {
+.btn svg {
   width: 35px;
   height: 35px;
   padding: 5px;
   cursor: pointer;
 }
 
-.minimize-btn:hover {
+.btn:hover {
   background-color: var(--white-hover);
 }
 

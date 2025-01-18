@@ -21,3 +21,4 @@ mistral_small = ChatMistralAI(model="mistral-small-latest", temperature=0, api_k
 mistral_embeddings = MistralAIEmbeddings(model="mistral-embed", api_key=MISTRAL_API_KEY)
 
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+FIRECRAWL_API_KEY = os.getenv("FIRECRAWL_API_KEY")

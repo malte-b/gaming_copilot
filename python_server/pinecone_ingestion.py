@@ -2,8 +2,8 @@ from pinecone import Pinecone
 from langchain_pinecone import PineconeVectorStore
 from langchain_core.documents import Document
 from uuid import uuid4
-from typing import List, Optional
-from pydantic import BaseModel, RootModel
+from typing import List, Optional, Any
+from pydantic import BaseModel, RootModel, Field, model_validator
 import json
 
 # --- internal imports
@@ -12,7 +12,16 @@ from config import PINECONE_API_KEY, mistral_embeddings
 
 class Metadata(BaseModel):
     title: str
-    category: Optional[str]
+    category: str
+
+    @model_validator(mode="before")
+    @classmethod
+    def check_category(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            category = data["category"]
+            if not category:
+                data["category"] = "No category"
+        return data
 
 
 class PageData(BaseModel):
@@ -62,6 +71,7 @@ def ingest_data_into_pinecone():
     uuids = [str(uuid4()) for _ in range(len(documents))]
     print(f"Adding {len(documents)} documents.")
     vector_store.add_documents(documents=documents, ids=uuids)
+
 
 # poetry run python pinecone_ingestion.py
 if __name__ == "__main__":

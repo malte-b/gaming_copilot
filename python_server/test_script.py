@@ -7,7 +7,7 @@ import webbrowser
 
 def main():
     url = "http://127.0.0.1:5000/generate-langchain-response-endpoint/"
-    payload = {"user_message": "What do villagers love?"}
+    payload = {"user_message": "What can you tell me about the Big Chest?"}
 
     # We'll collect all markdown pieces here so we can show a final rendered version later
     markdown_parts = []

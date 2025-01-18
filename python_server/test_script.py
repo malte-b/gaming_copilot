@@ -56,7 +56,7 @@ def main():
                     print("Could not parse JSON from line:", data_str)
 
     # 2) After streaming finishes, combine everything into one Markdown string
-    combined_markdown = "\n\n".join(markdown_parts)
+    combined_markdown = "".join(markdown_parts)
 
     # 3) Convert that Markdown to HTML
     html_output = markdown2.markdown(combined_markdown)

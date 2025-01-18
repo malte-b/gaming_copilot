@@ -29,9 +29,7 @@ async def generate_response(prompt_input: PromptInput) -> AsyncIterable[str]:
 
     # 2) running a simple LLM inference via pydantic_ai
     async with agent.run_stream(prompt_input.user_message) as result:
-        async for token in result.stream_text():
-            # 2) onTextToken event
-            # Each chunk of text the model produces is yielded as an SSE event
+        async for token in result.stream_text(delta=True):
             yield f"data: {json.dumps({'type': 'onTextToken', 'content': token, 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 
     # 3) onImageUrl event

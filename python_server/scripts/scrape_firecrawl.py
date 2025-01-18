@@ -52,7 +52,6 @@ def main(output_filename: str):
             all_scraped_data.append(data)
         except Exception as err:
             print(f"Failed to scrape {url}: {err}")
-        break
 
     # Save the aggregated data to JSON
     save_json(output_filename, all_scraped_data)

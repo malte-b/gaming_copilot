@@ -38,4 +38,8 @@ index_to_weaviate.connect("cleaner", "splitter")
 index_to_weaviate.connect("splitter", "embedder")
 index_to_weaviate.connect("embedder", "writer")
 
-index_to_weaviate.run({"converter": {"sources": [Path("data/stardewvalleywikicom_mediawiki-20250118-current.xml")]}})
+wiki_path = Path("wiki")
+files_list = []
+for file_path in wiki_path.glob("*"):
+    files_list.append(file_path)
+index_to_weaviate.run({"converter": {"sources": files_list}})

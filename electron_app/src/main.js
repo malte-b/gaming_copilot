@@ -29,13 +29,14 @@ function createWindow() {
     bubbleWindow.loadFile(path.join(__dirname, "windows", "bubble.html"));
 
     inputWindow = new BrowserWindow({
-        width: width - 400,
-        height: height - 400,
-        center: true,
-        resizable: false,
+        width: 500,
+        height: 700,
+        esizable: false,
         frame: false,
         alwaysOnTop: true,
         show: false, // we will manually display inputWindow when bubble is clicked
+        x: width - 500 - 100,
+        y: height - 700 - 200,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             nodeIntegration: true,

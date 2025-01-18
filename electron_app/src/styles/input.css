@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 
-.input-container {
+.nav-menu {
   display: flex;
   align-items: center;
   background-color: var(--primary);
@@ -36,4 +36,60 @@
 
 .minimize-btn:hover {
   background-color: var(--white-hover);
+}
+
+.wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages-area {
+  flex: 1 1 0%;
+  overflow: auto;
+  height: 100%;
+  margin-bottom: 60px;
+  padding: 40px;
+}
+
+.message {
+  background-color: var(--muted);
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 8px;
+  width: max-content;
+  max-width: 400px;
+}
+
+.input-container {
+  width: 100%;
+  height: 60px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  padding-inline: 40px;
+  border: 1px solid var(--muted);
+  z-index: 9999;
+}
+
+.input {
+  background: transparent;
+  border: none;
+  outline: none;
+  padding-block: 10px;
+  font-size: 16px;
+  flex: 1 1 0%;
+}
+
+.search-btn {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.search-icon {
+  color: black;
 }

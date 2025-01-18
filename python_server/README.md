@@ -12,7 +12,7 @@
 3. **Generate `requirements.txt`** using Poetry:
 
    ```bash
-   poetry export -f requirements.txt --without-hashes -o requirements.txt
+   poetry export --without-hashes --format=requirements.txt > requirements.txt
    ```
 
 4. **Install all dependencies** (no further Poetry usage required):

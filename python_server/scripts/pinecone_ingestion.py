@@ -1,78 +1,63 @@
+import json
+import uuid
+from typing import List
+
+from langchain_core.documents import Document
 from pinecone import Pinecone
 from langchain_pinecone import PineconeVectorStore
-from langchain_core.documents import Document
-from uuid import uuid4
-from typing import List, Optional, Any
-from pydantic import BaseModel, RootModel, Field, model_validator
-import json
 
-# --- internal imports
+# -- internal imports
 from config import PINECONE_API_KEY, mistral_embeddings
 
 
-class Metadata(BaseModel):
-    title: str
-    category: str
-
-    @model_validator(mode="before")
-    @classmethod
-    def check_category(cls, data: Any) -> Any:
-        if isinstance(data, dict):
-            category = data["category"]
-            if not category:
-                data["category"] = "No category"
-        return data
-
-
-class PageData(BaseModel):
-    page_content: str
-    metadata: Metadata
-
-
-class StardewPages(RootModel[List[PageData]]):
-    # Optionally implement an __iter__ for convenience
-    def __iter__(self):
-        return iter(self.root)
-
-
-def read_and_validate_stardew_pages(json_filename: str) -> StardewPages:
+def read_stardew_pages_no_validation(json_filename: str) -> List[dict]:
     """
-    Reads the JSON file specified by `json_filename` and validates
-    it against the StardewPages Pydantic model.
-    Returns a StardewPages instance.
+    Simply loads the JSON and returns it as a list of dicts
+    without any Pydantic validation or field manipulation.
     """
     with open(json_filename, "r", encoding="utf-8") as f:
         data = json.load(f)
-    # Use model_validate for Pydantic v2
-    stardew_pages = StardewPages.model_validate(data)
-    return stardew_pages
+    # e.g. data is [ { "markdown": "...", "metadata": {...} }, ... ]
+    return data
 
 
-def convert_stardew_pages_to_documents(stardew_pages: StardewPages) -> List[Document]:
+def convert_to_documents_no_validation(stardew_data: List[dict]) -> List[Document]:
     """
-    Converts validated StardewPages data into a list of LangChain Document objects.
+    Takes the raw list of dicts and converts them to LangChain Document objects.
+    The 'markdown' field becomes page_content; the 'metadata' field stays as metadata.
     """
     docs = []
-    # Either iterate over stardew_pages.root
-    # or rely on the __iter__ implementation shown above
-    for page in stardew_pages:
-        doc = Document(page_content=page.page_content, metadata={"title": page.metadata.title, "category": page.metadata.category})
+    for item in stardew_data:
+        # Safely get your fields
+        markdown = item.get("markdown", "")
+        metadata = item.get("metadata", {})
+
+        # Create the Document
+        doc = Document(page_content=markdown, metadata=metadata)
         docs.append(doc)
     return docs
 
 
-def ingest_data_into_pinecone():
+def ingest_data_into_pinecone_no_validation(json_filename: str = "scraped_data.json"):
+    # Initialize Pinecone connection
     pc = Pinecone(api_key=PINECONE_API_KEY)
-    index = pc.Index(name="gaming-copilot", host="https://gaming-copilot-mipa415.svc.aped-4627-b74a.pinecone.io")
+    index = pc.Index(
+        name="gaming-copilot",
+        host="https://gaming-copilot-mipa415.svc.aped-4627-b74a.pinecone.io",
+    )
     vector_store = PineconeVectorStore(index=index, embedding=mistral_embeddings)
 
-    stardew_pages = read_and_validate_stardew_pages("wiki_json.json")
-    documents = convert_stardew_pages_to_documents(stardew_pages)
-    uuids = [str(uuid4()) for _ in range(len(documents))]
-    print(f"Adding {len(documents)} documents.")
-    vector_store.add_documents(documents=documents, ids=uuids)
+    # Load raw JSON and convert to Documents
+    stardew_data = read_stardew_pages_no_validation(json_filename)
+    documents = convert_to_documents_no_validation(stardew_data)
+
+    # Generate unique IDs for each Document
+    doc_ids = [str(uuid.uuid4()) for _ in range(len(documents))]
+
+    print(f"Adding {len(documents)} documents to Pinecone.")
+    vector_store.add_documents(documents=documents, ids=doc_ids)
 
 
-# poetry run python pinecone_ingestion.py
+# poetry run python -m scripts.pinecone_ingestion
 if __name__ == "__main__":
-    ingest_data_into_pinecone()
+    ingest_data_into_pinecone_no_validation()

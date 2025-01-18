@@ -13,10 +13,13 @@ from haystack_integrations.components.generators.mistral import MistralChatGener
 from haystack import Pipeline
 from haystack.dataclasses import ChatMessage
 from dotenv import load_dotenv
-
+from langchain_core.runnables import RunnableParallel
+from operator import itemgetter
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 # --- internal imports
-from config import TIMEZONE, DELIMITER, WEAVIATE_URL
+from config import TIMEZONE, DELIMITER, WEAVIATE_URL, mistral_small
 from api.api_models import PromptInput
 
 router = APIRouter()
@@ -25,48 +28,36 @@ load_dotenv()
 
 
 async def generate_response(prompt_input: PromptInput) -> AsyncIterable[str]:
-    auth_client_secret = AuthApiKey()
-    document_store = WeaviateDocumentStore(url=WEAVIATE_URL, auth_client_secret=auth_client_secret)
-
-    message_template = """
-    Answer the users question based on the context provided.
-    Each retreived context chunk is followed by the URL it comes from.
-    Reference the URLs from which your answer is generated.
-
-    Context:
-    {% for doc in documents %}
-    Content: {{doc.content}}
-    URL: {{doc.meta['url']}}
-    {% endfor %}
-    Qyestion: {{query}}
-    """
-
-    referenced_rag = Pipeline()
-    referenced_rag.add_component("query_embedder", MistralTextEmbedder())
-    referenced_rag.add_component("retriever", WeaviateEmbeddingRetriever(document_store=document_store))
-    referenced_rag.add_component("prompt", ChatPromptBuilder(variables=["documents"]))
-    referenced_rag.add_component("llm", MistralChatGenerator(model="mistral-small-latest"))
-
-    referenced_rag.connect("query_embedder.embedding", "retriever.query_embedding")
-    referenced_rag.connect("retriever.documents", "prompt.documents")
-    referenced_rag.connect("prompt.prompt", "llm.messages")
-
-    print("Response generation started...")
-    messages = [ChatMessage.from_user(message_template)]
-    result = referenced_rag.run(
-        {
-            "query_embedder": {"text": prompt_input.user_message},
-            "retriever": {"top_k": 5},
-            "prompt": {"template_variables": {"query": prompt_input.user_message}, "template": messages},
-        }
+    simple_rag_prompt = ChatPromptTemplate(
+        [
+            (
+                "system",
+                "You are a helpful AI bot. Your name is {name}. Answer the users question based on the context provided. Context: {context}",
+            ),
+            ("human", "{user_message}"),
+        ]
     )
-    print(result["retriever"]["documents"])
+    string_output_rag_runnable = (
+        RunnableParallel(
+            {
+                "name": itemgetter("name"),
+                "context": itemgetter("context"),
+                "user_message": itemgetter("user_message"),
+            }
+        )
+        | simple_rag_prompt
+        | mistral_small
+        | StrOutputParser()
+    )
+    ai_msg = string_output_rag_runnable.invoke(
+        input={"name": "Gaming Companion", "context": "Davids birthday is the 18th of July 1997", "user_message": prompt_input.user_message}
+    )
 
     # 1) onStart event
     yield f"data: {json.dumps({'type': 'onStart', 'content': 'Stream is starting!', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 
     # 2) Text event
-    yield f"data: {json.dumps({'type': 'onText', 'content': result['llm']['replies'][0]._content[0].text, 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+    yield f"data: {json.dumps({'type': 'onText', 'content': ai_msg, 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 
     # 3) onImageUrl event
     yield f"data: {json.dumps({'type': 'onImageUrl', 'content': 'https://stardewvalleywiki.com/mediawiki/images/a/af/Horse_rider.png', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"

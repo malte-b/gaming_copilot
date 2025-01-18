@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import Wrapper from "./main-process/wrapper";
+import Bubble from "./main-process/bubble";
 
 const root = createRoot(document.body);
-root.render(<Wrapper />);
+root.render(<Bubble />);

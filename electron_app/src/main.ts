@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, screen } from "electron";
 import path from "path";
 import started from "electron-squirrel-startup";
 
@@ -8,26 +8,39 @@ if (started) {
 }
 
 const createWindow = () => {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+  const bubbleWindow = new BrowserWindow({
+    width: 100,
+    height: 100,
+    frame: false,
+    resizable: false,
+    transparent: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: true,
+      contextIsolation: false,
     },
   });
 
+  bubbleWindow.setAutoHideMenuBar(true);
+  bubbleWindow.setAlwaysOnTop(true);
+  bubbleWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  bubbleWindow.setHasShadow(false);
+
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  bubbleWindow.setPosition(width - 200, height - 200);
+
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+    // mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+    bubbleWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(
+    bubbleWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  bubbleWindow.webContents.openDevTools({ mode: "detach" });
 };
 
 // This method will be called when Electron has finished

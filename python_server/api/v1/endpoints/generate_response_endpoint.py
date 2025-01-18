@@ -17,7 +17,20 @@ class PromptInput(BaseModel):
 
 
 async def generate_response(prompt_input: PromptInput) -> AsyncIterable[str]:
+    # 1) onStart event
     yield f"data: {json.dumps({'type': 'onStart', 'content': 'Stream is starting!', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+    
+    # 2) onTextToken event with markdown
+    yield f"data: {json.dumps({'type': 'onTextToken', 'content': '### This is a sample **Markdown** text', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+    
+    # 3) onImageUrl event
+    yield f"data: {json.dumps({'type': 'onImageUrl', 'content': 'https://stardewvalleywiki.com/mediawiki/images/a/af/Horse_rider.png', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+        
+    # 4) onTextToken event with more markdown
+    yield f"data: {json.dumps({'type': 'onTextToken', 'content': 'Here is another piece of **markdown** text!', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+    
+    # 5) onEnd event
+    yield f"data: {json.dumps({'type': 'onEnd', 'content': 'Stream has ended.', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 
 
 @router.post("/generate-response-endpoint/")

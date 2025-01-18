@@ -25,7 +25,7 @@ document_store = WeaviateDocumentStore(
 index_to_weaviate = Pipeline()
 
 # index_to_weaviate.add_component("fetcher", LinkContentFetcher())
-index_to_weaviate.add_component("converter", HTMLToDocument)#TikaDocumentConverter())
+index_to_weaviate.add_component("converter", TikaDocumentConverter())
 index_to_weaviate.add_component("cleaner", DocumentCleaner())
 index_to_weaviate.add_component("splitter", DocumentSplitter())
 index_to_weaviate.add_component("embedder", MistralDocumentEmbedder())

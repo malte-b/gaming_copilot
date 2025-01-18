@@ -7,7 +7,7 @@ from api.v1.routers import api_router
 origins = []
 origins.append("http://localhost:3000")
 
-#### run with "poetry run uvicorn main:app --port 5000"
+# --- if you are using poetry run from the "python_server" directory with "poetry run uvicorn main:app --port 5000"
 app = FastAPI(title="gaming_copilot")
 app.add_middleware(
     CORSMiddleware,

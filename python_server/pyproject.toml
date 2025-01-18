@@ -7,6 +7,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "~3.11"
+fastapi = "^0.115.6"
+pydantic = "^2.10.5"
+pytz = "^2024.2"
 
 
 [build-system]

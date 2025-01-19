@@ -12,6 +12,7 @@ document
         const formData = new FormData(event.target);
         const user_message = formData.get("query");
         if (!user_message) {
+            // @ TODO: Show an alert
             return;
         }
 

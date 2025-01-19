@@ -1,5 +1,6 @@
-const { BrowserWindow, app, screen, ipcMain } = require("electron");
+const { BrowserWindow, app, screen, ipcMain, desktopCapturer } = require("electron");
 const path = require("path");
+const fs = require('fs')
 const { IPC_EVENTS } = require("./utils/events");
 
 let bubbleWindow
@@ -53,7 +54,7 @@ app.whenReady().then(() => {
     ipcMain.on(IPC_EVENTS.TRIGGER_INPUT_WINDOW, () => {
         bubbleWindow.hide()
         inputWindow.show()
-        inputWindow.webContents.openDevTools({ mode: 'detach' })
+        // inputWindow.webContents.openDevTools({ mode: 'detach' })
     })
 
     /** Handling the event when user clicks on the minimize button */
@@ -63,8 +64,31 @@ app.whenReady().then(() => {
     })
 
     /** Handling screenshot */
-    ipcMain.on(IPC_EVENTS.SCREENSHOT, () => {
-        console.log("I will handle it.")
+    ipcMain.on(IPC_EVENTS.SCREENSHOT, async () => {
+        try {
+            const sources = await desktopCapturer.getSources({
+                types: ['screen', 'window']
+            })
+
+            const entireScreen = sources.find(source => source.name === 'Entire screen')
+            if (!entireScreen) {
+                // @TODO: Show an alert
+                return
+            }
+
+            // Get the thumbnail image
+            const screenshot = entireScreen.thumbnail.toPNG();
+
+            // Define a save path
+            const savePath = path.join(__dirname, "screenshot.png");
+
+            // Write the image to a file
+            fs.writeFileSync(savePath, screenshot);
+
+
+        } catch (cause) {
+            console.log(cause)
+        }
     })
 
     app.on("activate", () => {

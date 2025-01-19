@@ -75,6 +75,13 @@ document
         event.target.reset();
     });
 
+/**
+ * Remove everything from input
+ */
+document.getElementById('refresh').addEventListener('click', () => {
+    messagesContainer.innerHTML = ''
+})
+
 
 function appendMessage(message, type, isScreenshot = false) {
     // Creating outer div of message

@@ -35,8 +35,7 @@ async def retrieve_with_weaviate(prompt_input: PromptInput) -> List[Document]:
 
 def run_mistral(user_message, model="mistral-large-latest"):
     client = Mistral(api_key=MISTRAL_API_KEY)
-    messages = [{"role": "user", "content": user_message}]
-    chat_response = client.chat.complete(model=model, messages=messages)
+    chat_response = client.chat.complete(model=model, messages=user_message)
     return chat_response.choices[0].message.content
 
 
@@ -52,7 +51,7 @@ def generate_vision_response(prompt_input: PromptInput) -> str:
         }
     ]
 
-    chat_response = run_mistral(model=pixtral_large, messages=messages)
+    chat_response = run_mistral(model=pixtral_large, user_message=messages)
 
     return chat_response.choices[0].message.content
 
@@ -79,7 +78,7 @@ async def generate_rag_response(prompt_input: PromptInput, image_description: st
         }
     ]
 
-    chat_response = run_mistral(messages)
+    chat_response = run_mistral(user_message=messages)
 
     yield chat_response.choices[0].message.content
 

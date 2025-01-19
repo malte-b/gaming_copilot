@@ -48,6 +48,7 @@ document
         event.target.reset();
     });
 
+
 function appendMessage(message, type) {
     // Creating outer div of message
     const messageWrapperDiv = document.createElement("div");
@@ -129,3 +130,12 @@ document.getElementById("minimize").addEventListener("click", () => {
 document.getElementById("screenshot").addEventListener("click", (event) => {
     window.electron.screenshot();
 });
+
+/**
+ * Handling the case when main process has taken a screenshot and sends us an event
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    window.electron.screenshotTaken(data => {
+        console.log(data)
+    })
+})

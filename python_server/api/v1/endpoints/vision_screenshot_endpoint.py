@@ -58,6 +58,7 @@ def generate_vision_response(prompt_input: PromptInput) -> str:
 
 async def generate_rag_response(prompt_input: PromptInput, image_description: str) -> AsyncIterable:
     vector_db_context = await retrieve_with_weaviate(prompt_input, image_description)
+    document_strings = "\n\n".join([document.page_content for document in vector_db_context])
     messages = [
         {
             "role": "user",
@@ -68,7 +69,7 @@ async def generate_rag_response(prompt_input: PromptInput, image_description: st
             ---------------------
             And given the following context:
             ---------------------
-            {vector_db_context}
+            {document_strings}
             ---------------------
             Answer the following question:
             ---------------------

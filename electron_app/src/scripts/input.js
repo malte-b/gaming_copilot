@@ -66,12 +66,16 @@ function appendMessage(message, type) {
         // Appending message image to div
         messageWrapperDiv.appendChild(messageImg);
     } else {
-        const messageP = document.createElement("p");
-        messageP.classList.add("message");
-        messageP.innerText = message;
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message");
+
+        // Transforming markdown to html
+        const converter = new showdown.Converter()
+        const html = converter.makeHtml(message);
+        messageDiv.innerHTML = html;
 
         // Appending message `p` to div
-        messageWrapperDiv.appendChild(messageP);
+        messageWrapperDiv.appendChild(messageDiv);
     }
 
     // Apending div to our messages container

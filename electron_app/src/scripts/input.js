@@ -16,6 +16,7 @@ document
         }
 
         appendMessage(user_message, "user-message")
+        startThinking()
 
         const source = new SSE(
             "http://localhost:5000/generate-langchain-response-endpoint/",
@@ -29,6 +30,8 @@ document
         );
 
         source.addEventListener("message", function (event) {
+            stopThinking()
+
             const payload = JSON.parse(event.data.replace('---END OF EVENT---', ''))
 
 
@@ -72,6 +75,26 @@ function appendMessage(message, type) {
 
     // Apending div to our messages container
     messagesContainer.appendChild(messageWrapperDiv);
+}
+
+function startThinking() {
+    const messageWrapperDiv = document.createElement("div");
+    messageWrapperDiv.classList.add("message-wrapper");
+    messageWrapperDiv.id = 'thinking'
+
+    const thinkingDiv = document.createElement('div')
+    thinkingDiv.classList.add('message')
+    thinkingDiv.innerText = 'Copilot is thinking...'
+    messageWrapperDiv.appendChild(thinkingDiv)
+
+    messagesContainer.appendChild(messageWrapperDiv)
+}
+
+function stopThinking() {
+    const thinkingDiv = document.getElementById('thinking')
+    if (thinkingDiv && thinkingDiv.parentNode) {
+        thinkingDiv.parentNode.removeChild(thinkingDiv)
+    }
 }
 
 

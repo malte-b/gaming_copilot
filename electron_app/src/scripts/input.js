@@ -1,5 +1,6 @@
 const messagesContainer = document.querySelector(".messages-container");
 const screenshotContainer = document.getElementById('screenshot-container')
+const inputForm = document.getElementById('input-form')
 
 const SCREENSHOT_ENDPOINT = 'http://localhost:5000/vision-screenshot-endpoint/'
 const GENERAL_MESSAGE_ENDPOINT = 'http://localhost:5000/generate-langchain-response-endpoint/'
@@ -30,6 +31,11 @@ document
         // Cleanup when user submits the form
         appendMessage(user_message, "user-message")
         event.target.reset()
+
+        const screenshotImage = document.getElementById('screenshot-image')
+        if (screenshotImage) {
+            screenshotContainer.removeChild(screenshotImage)
+        }
         screenshotContainer.classList.remove('visible')
 
         startThinking()
@@ -48,6 +54,11 @@ document
 
         source.addEventListener("message", function (event) {
             stopThinking()
+            const screenshotInput = document.getElementById('screenshot-input')
+            if (screenshotInput && screenshotInput.parentNode) {
+                screenshotInput.parentNode.removeChild(screenshotInput)
+            }
+
 
             const payload = JSON.parse(event.data.replace('---END OF EVENT---', ''))
 
@@ -63,6 +74,13 @@ document
 
         event.target.reset();
     });
+
+/**
+ * Remove everything from input
+ */
+document.getElementById('refresh').addEventListener('click', () => {
+    messagesContainer.innerHTML = ''
+})
 
 
 function appendMessage(message, type, isScreenshot = false) {
@@ -160,8 +178,10 @@ document.addEventListener("DOMContentLoaded", () => {
     window.electron.screenshotTaken(data => {
         const img = document.createElement('img')
         img.src = data
+        img.id = 'screenshot-image'
 
         const screenshotInput = document.createElement('input')
+        screenshotInput.id = 'screenshot-input'
         screenshotInput.value = data.replace("data:image/png;base64,", "")
         screenshotInput.name = 'screenshot'
         screenshotInput.setAttribute('type', 'hidden')

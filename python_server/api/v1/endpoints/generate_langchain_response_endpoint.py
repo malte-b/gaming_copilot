@@ -34,18 +34,13 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 async def retrieve_with_weaviate(prompt_input: PromptInput) -> List[Document]:
     # RETRIEVAL
     client = weaviate.connect_to_weaviate_cloud(
-        cluster_url=WEAVIATE_URL,
-        auth_credentials=AuthApiKey(WEAVIATE_API_KEY),
-        headers={
-            "X-Mistral-Api-Key": MISTRAL_API_KEY
-        }
+        cluster_url=WEAVIATE_URL, auth_credentials=AuthApiKey(WEAVIATE_API_KEY), headers={"X-Mistral-Api-Key": MISTRAL_API_KEY}
     )
     chunks = client.collections.get("StardewWiki")
-    retrieved_documents = chunks.query.near_text(
-                query=prompt_input.user_message, 
-                limit=3)
+    retrieved_documents = chunks.query.near_text(query=prompt_input.user_message, limit=3)
     client.close()
     return retrieved_documents
+
 
 async def retrieve_with_pinecone(prompt_input: PromptInput) -> List[Document]:
     # RETRIEVAL
@@ -65,21 +60,16 @@ async def retrieve_with_pinecone(prompt_input: PromptInput) -> List[Document]:
     )
     return retrieved_documents
 
+
 def run_mistral(user_message, model="mistral-large-latest"):
     client = Mistral(api_key=MISTRAL_API_KEY)
-    messages = [
-        {
-            "role": "user", "content": user_message
-        }
-    ]
-    chat_response = client.chat.complete(
-        model=model,
-        messages=messages
-    )
-    return (chat_response.choices[0].message.content)
+    messages = [{"role": "user", "content": user_message}]
+    chat_response = client.chat.complete(model=model, messages=messages)
+    return chat_response.choices[0].message.content
+
 
 async def generate_response_with_weaviate(prompt_input: PromptInput) -> AsyncIterable[str]:
-    retrieved_documents = retrieve_with_weaviate(prompt_input)
+    retrieved_documents = await retrieve_with_weaviate(prompt_input)
     prompt = f"""
         Context information is below.
         ---------------------
@@ -101,7 +91,6 @@ async def generate_response_with_weaviate(prompt_input: PromptInput) -> AsyncIte
 
     # 5) onEnd event
     yield f"data: {json.dumps({'type': 'onEnd', 'content': 'Stream has ended.', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
-
 
 
 async def generate_response_with_pinecone(prompt_input: PromptInput) -> AsyncIterable[str]:

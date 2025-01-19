@@ -4,13 +4,22 @@
   box-sizing: border-box;
 }
 
+body {
+  position: relative;
+}
+
 .nav-menu {
   display: flex;
   align-items: center;
   background-color: var(--primary);
   justify-content: space-between;
-  padding-block: 20px;
-  padding-inline: 40px;
+  padding-inline: 30px;
+  display: flex;
+  height: 64px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 .bot-icon {
@@ -19,7 +28,13 @@
   height: 40px;
 }
 
-.minimize-btn {
+.flex {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
   border: none;
   outline: none;
   color: white;
@@ -27,14 +42,14 @@
   border-radius: 5px;
 }
 
-.minimize-btn svg {
+.btn svg {
   width: 35px;
   height: 35px;
   padding: 5px;
   cursor: pointer;
 }
 
-.minimize-btn:hover {
+.btn:hover {
   background-color: var(--white-hover);
 }
 
@@ -49,12 +64,14 @@
   overflow: auto;
   height: 100%;
   margin-bottom: 60px;
+  margin-top: 64px;
   padding: 40px;
 }
 
 .message-wrapper {
   display: flex;
   align-items: center;
+  margin-bottom: 12px;
 }
 
 .reverse {
@@ -65,15 +82,14 @@
   background-color: var(--muted);
   padding: 10px;
   border-radius: 5px;
-  margin-bottom: 8px;
   width: max-content;
-  max-width: 400px;
+  max-width: 350px;
 }
 
 .input-container {
   width: 100%;
   height: 60px;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   display: flex;
@@ -81,6 +97,7 @@
   padding-inline: 40px;
   border: 1px solid var(--muted);
   z-index: 9999;
+  background-color: white;
 }
 
 .input {
@@ -90,6 +107,7 @@
   padding-block: 10px;
   font-size: 16px;
   flex: 1 1 0%;
+  margin-right: 4px;
 }
 
 .search-btn {
@@ -101,4 +119,9 @@
 
 .search-icon {
   color: black;
+}
+
+.inline-list {
+  padding-left: 20px;
+  padding-block: 10px;
 }

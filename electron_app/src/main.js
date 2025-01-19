@@ -1,5 +1,6 @@
-const { BrowserWindow, app, screen, ipcMain } = require("electron");
+const { BrowserWindow, app, screen, ipcMain, desktopCapturer } = require("electron");
 const path = require("path");
+const fs = require('fs')
 const { IPC_EVENTS } = require("./utils/events");
 
 let bubbleWindow
@@ -40,6 +41,7 @@ function createWindow() {
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             nodeIntegration: true,
+            webSecurity: false
         }
     })
     inputWindow.loadFile(path.join(__dirname, "windows", "input.html"));
@@ -59,6 +61,34 @@ app.whenReady().then(() => {
     ipcMain.on(IPC_EVENTS.MINIMIZE, () => {
         inputWindow.hide()
         bubbleWindow.show()
+    })
+
+    /** Handling screenshot */
+    ipcMain.on(IPC_EVENTS.SCREENSHOT, async () => {
+        try {
+            const sources = await desktopCapturer.getSources({
+                types: ['screen', 'window']
+            })
+
+            const entireScreen = sources.find(source => source.name === 'Entire screen')
+            if (!entireScreen) {
+                // @TODO: Show an alert
+                return
+            }
+
+            // Get the thumbnail image
+            const screenshot = entireScreen.thumbnail.toPNG();
+
+            // Define a save path
+            const savePath = path.join(__dirname, "screenshot.png");
+
+            // Write the image to a file
+            fs.writeFileSync(savePath, screenshot);
+
+
+        } catch (cause) {
+            console.log(cause)
+        }
     })
 
     app.on("activate", () => {

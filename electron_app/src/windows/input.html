@@ -2,17 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <meta
-      http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
     <title>Gaming Copilot</title>
     <link rel="stylesheet" href="../styles/input.css" />
     <link rel="stylesheet" href="../styles/variables.css" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"
+      defer
+    ></script>
   </head>
   <body>
     <div class="nav-menu">
@@ -36,24 +32,44 @@
         <path d="M9 13v2" />
       </svg>
 
-      <button id="minimize" class="minimize-btn">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polyline points="4 14 10 14 10 20" />
-          <polyline points="20 10 14 10 14 4" />
-          <line x1="14" x2="21" y1="10" y2="3" />
-          <line x1="3" x2="10" y1="21" y2="14" />
-        </svg>
-      </button>
+      <div class="flex">
+        <button id="screenshot" class="btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"
+            />
+            <circle cx="12" cy="13" r="3" />
+          </svg>
+        </button>
+        <button id="minimize" class="btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="4 14 10 14 10 20" />
+            <polyline points="20 10 14 10 14 4" />
+            <line x1="14" x2="21" y1="10" y2="3" />
+            <line x1="3" x2="10" y1="21" y2="14" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="messages-container"></div>
@@ -84,6 +100,8 @@
         </svg>
       </button>
     </form>
+
+    <script src="../scripts/sse.js"></script>
     <script src="../scripts/input.js"></script>
   </body>
 </html>

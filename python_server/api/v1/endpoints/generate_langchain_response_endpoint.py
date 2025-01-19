@@ -63,7 +63,10 @@ async def retrieve_with_pinecone(prompt_input: PromptInput) -> List[Document]:
 
 def run_mistral(user_message, model="mistral-large-latest"):
     client = Mistral(api_key=MISTRAL_API_KEY)
-    messages = [{"role": "user", "content": user_message}]
+    system_message = """
+        You are a helpful, friendly and witty video game assistant for the game 'Stardew Valley'.
+    """
+    messages = [{"role": "system", "content": system_message}, {"role": "user", "content": user_message}]
     chat_response = client.chat.complete(model=model, messages=messages)
     return chat_response.choices[0].message.content
 
@@ -83,11 +86,11 @@ async def generate_response_with_weaviate(prompt_input: PromptInput) -> AsyncIte
     # 1) onStart event
     yield f"data: {json.dumps({'type': 'onStart', 'content': 'Stream is starting!', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 
-    # 2) Text event
-    yield f"data: {json.dumps({'type': 'onText', 'content': ai_msg, 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+    # 2) onImageUrl event
+    yield f"data: {json.dumps({'type': 'onImageUrl', 'content': 'https://stardewvalleywiki.com/mediawiki/images/c/c7/Wizard.png', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 
-    # 3) onImageUrl event
-    yield f"data: {json.dumps({'type': 'onImageUrl', 'content': 'https://stardewvalleywiki.com/mediawiki/images/a/af/Horse_rider.png', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+    # 3) Text event
+    yield f"data: {json.dumps({'type': 'onText', 'content': ai_msg, 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 
     # 5) onEnd event
     yield f"data: {json.dumps({'type': 'onEnd', 'content': 'Stream has ended.', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"

@@ -79,7 +79,7 @@ def run_mistral(user_message, model="mistral-large-latest"):
     return (chat_response.choices[0].message.content)
 
 async def generate_response_with_weaviate(prompt_input: PromptInput) -> AsyncIterable[str]:
-    retrieved_documents = retrieve_with_weaviate(prompt_input)
+    retrieved_documents = await retrieve_with_weaviate(prompt_input)
     prompt = f"""
         Context information is below.
         ---------------------

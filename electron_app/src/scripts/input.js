@@ -24,7 +24,7 @@ document
         const payload = { user_message }
         if (screenshot) {
             payload.image = screenshot
-            appendMessage(screenshot, "image-url")
+            appendMessage(screenshot, "image-url", true)
         }
 
         // Cleanup when user submits the form
@@ -65,7 +65,7 @@ document
     });
 
 
-function appendMessage(message, type) {
+function appendMessage(message, type, isScreenshot = false) {
     // Creating outer div of message
     const messageWrapperDiv = document.createElement("div");
     messageWrapperDiv.classList.add("message-wrapper");
@@ -78,8 +78,7 @@ function appendMessage(message, type) {
     // Creating actual message `p`
     if (type === 'image-url') {
         const messageImg = document.createElement('img')
-        messageImg.src = message
-        const isScreenshot = message.startsWith("data:image/png")
+        messageImg.src = isScreenshot ? `data:image/png;base64,${message}` : message
         messageImg.classList.add(isScreenshot ? 'screenshot-img' : 'message-img')
 
         if (isScreenshot) {
@@ -163,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
         img.src = data
 
         const screenshotInput = document.createElement('input')
-        screenshotInput.value = data
+        screenshotInput.value = data.replace("data:image/png;base64,", "")
         screenshotInput.name = 'screenshot'
         screenshotInput.setAttribute('type', 'hidden')
         screenshotContainer.appendChild(screenshotInput)

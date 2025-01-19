@@ -9,9 +9,12 @@ from mistralai import Mistral
 import weaviate
 from weaviate.auth import AuthApiKey
 from langchain_core.documents.base import Document
+import json
+from datetime import datetime
 
 
-from config import pixtral_large
+
+from config import TIMEZONE, DELIMITER
 
 load_dotenv()
 
@@ -80,7 +83,13 @@ async def generate_rag_response(prompt_input: PromptInput, image_description: st
 
     chat_response = run_mistral(user_message=messages)
 
-    yield chat_response
+    yield f"data: {json.dumps({'type': 'onStart', 'content': 'Stream is starting!', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+
+    # 2) Text event
+    yield f"data: {json.dumps({'type': 'onText', 'content': chat_response, 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+
+    # 5) onEnd event
+    yield f"data: {json.dumps({'type': 'onEnd', 'content': 'Stream has ended.', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 
 
 @router.post("/vision-screenshot-endpoint/")

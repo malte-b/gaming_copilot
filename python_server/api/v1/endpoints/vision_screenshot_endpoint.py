@@ -33,15 +33,14 @@ async def retrieve_with_weaviate(prompt_input: PromptInput) -> List[Document]:
     return retrieved_documents
 
 
-def run_mistral(user_message, model="mistral-large-latest"):
+def run_mistral(user_message, model="mistral-large-latest") -> str:
     client = Mistral(api_key=MISTRAL_API_KEY)
     chat_response = client.chat.complete(model=model, messages=user_message)
-    print(type(chat_response.choices[0].message.content))
     return chat_response.choices[0].message.content
 
 
 def generate_vision_response(prompt_input: PromptInput) -> str:
-    base64_image = prompt_input.image
+    base64_image: str = prompt_input.image
     messages = [
         {
             "role": "user",
@@ -52,12 +51,12 @@ def generate_vision_response(prompt_input: PromptInput) -> str:
         }
     ]
 
-    chat_response = run_mistral(model=pixtral_large, user_message=messages)
+    chat_response = run_mistral(model="pixtral-large-latest", user_message=messages)
 
     return chat_response
 
 
-async def generate_rag_response(prompt_input: PromptInput, image_description: str) -> AsyncIterable:
+async def generate_rag_response(prompt_input: PromptInput, image_description: str) -> AsyncIterable[str]:
     vector_db_context = await retrieve_with_weaviate(prompt_input, image_description)
     document_strings = "\n\n".join([document.page_content for document in vector_db_context])
     messages = [

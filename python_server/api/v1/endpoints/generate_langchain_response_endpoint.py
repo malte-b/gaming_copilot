@@ -124,8 +124,8 @@ async def generate_response_with_pinecone(prompt_input: PromptInput) -> AsyncIte
 
 
 @router.post("/generate-langchain-response-endpoint/")
-async def generate_response_handler(body: PromptInput, use_pinecone: bool = False) -> StreamingResponse:
-    if use_pinecone:
+async def generate_response_handler(body: PromptInput) -> StreamingResponse:
+    if body.use_pinecone:
         generator = generate_response_with_pinecone(prompt_input=body)
     else:
         generator = generate_response_with_weaviate(prompt_input=body)

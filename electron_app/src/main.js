@@ -3,7 +3,10 @@ const path = require("path");
 const fs = require('fs')
 const { IPC_EVENTS } = require("./utils/events");
 
+/** @type {BrowserWindow | null} */
 let bubbleWindow
+
+/** @type {BrowserWindow | null} */
 let inputWindow
 
 function createWindow() {
@@ -77,15 +80,10 @@ app.whenReady().then(() => {
             }
 
             // Get the thumbnail image
-            const screenshot = entireScreen.thumbnail.toPNG();
+            const screenshot = entireScreen.thumbnail.toDataURL();
 
-            // Define a save path
-            const savePath = path.join(__dirname, "screenshot.png");
-
-            // Write the image to a file
-            fs.writeFileSync(savePath, screenshot);
-
-
+            // Send event to renderer with screenshot base64 
+            inputWindow.webContents.send(IPC_EVENTS.SCREENSHOT_TAKEN, screenshot)
         } catch (cause) {
             console.log(cause)
         }

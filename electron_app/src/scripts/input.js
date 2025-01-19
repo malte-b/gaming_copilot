@@ -1,4 +1,8 @@
 const messagesContainer = document.querySelector(".messages-container");
+const screenshotContainer = document.getElementById('screenshot-container')
+
+const SCREENSHOT_ENDPOINT = 'http://localhost:5000/vision-screenshot-endpoint/'
+const GENERAL_MESSAGE_ENDPOINT = 'http://localhost:5000/generate-langchain-response-endpoint/'
 
 /**
  * Handling the case when user submits the form either by clicking on search button
@@ -16,13 +20,25 @@ document
             return;
         }
 
+        const screenshot = formData.get('screenshot')
+        const payload = { user_message }
+        if (screenshot) {
+            payload.image = screenshot
+            appendMessage(screenshot, "image-url", true)
+        }
+
+        // Cleanup when user submits the form
         appendMessage(user_message, "user-message")
+        event.target.reset()
+        screenshotContainer.classList.remove('visible')
+
         startThinking()
 
+
         const source = new SSE(
-            "http://127.0.0.1:5000/generate-langchain-response-endpoint",
+            screenshot ? SCREENSHOT_ENDPOINT : GENERAL_MESSAGE_ENDPOINT,
             {
-                payload: JSON.stringify({ user_message }),
+                payload: JSON.stringify(payload),
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -48,7 +64,8 @@ document
         event.target.reset();
     });
 
-function appendMessage(message, type) {
+
+function appendMessage(message, type, isScreenshot = false) {
     // Creating outer div of message
     const messageWrapperDiv = document.createElement("div");
     messageWrapperDiv.classList.add("message-wrapper");
@@ -61,7 +78,13 @@ function appendMessage(message, type) {
     // Creating actual message `p`
     if (type === 'image-url') {
         const messageImg = document.createElement('img')
-        messageImg.src = message
+        messageImg.src = isScreenshot ? `data:image/png;base64,${message}` : message
+        messageImg.classList.add(isScreenshot ? 'screenshot-img' : 'message-img')
+
+        if (isScreenshot) {
+            messageWrapperDiv.classList.add('reverse')
+        }
+
 
         // Appending message image to div
         messageWrapperDiv.appendChild(messageImg);
@@ -129,3 +152,22 @@ document.getElementById("minimize").addEventListener("click", () => {
 document.getElementById("screenshot").addEventListener("click", (event) => {
     window.electron.screenshot();
 });
+
+/**
+ * Handling the case when main process has taken a screenshot and sends us an event
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    window.electron.screenshotTaken(data => {
+        const img = document.createElement('img')
+        img.src = data
+
+        const screenshotInput = document.createElement('input')
+        screenshotInput.value = data.replace("data:image/png;base64,", "")
+        screenshotInput.name = 'screenshot'
+        screenshotInput.setAttribute('type', 'hidden')
+        screenshotContainer.appendChild(screenshotInput)
+
+        screenshotContainer.appendChild(img)
+        screenshotContainer.classList.add('visible')
+    })
+})

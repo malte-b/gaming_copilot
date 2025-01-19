@@ -22,7 +22,7 @@ document
         const source = new SSE(
             "http://localhost:5000/generate-langchain-response-endpoint",
             {
-                payload: JSON.stringify({ user_message, use_pinecone: true }),
+                payload: JSON.stringify({ user_message }),
                 headers: {
                     'Content-Type': 'application/json'
                 },

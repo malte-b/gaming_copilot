@@ -36,6 +36,7 @@ async def retrieve_with_weaviate(prompt_input: PromptInput) -> List[Document]:
 def run_mistral(user_message, model="mistral-large-latest") -> str:
     client = Mistral(api_key=MISTRAL_API_KEY)
     chat_response = client.chat.complete(model=model, messages=user_message)
+    print(type(chat_response.choices[0].message.content))
     return chat_response.choices[0].message.content
 
 

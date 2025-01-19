@@ -53,7 +53,7 @@ def generate_vision_response(prompt_input: PromptInput) -> str:
 
     chat_response = run_mistral(model=pixtral_large, user_message=messages)
 
-    return chat_response.choices[0].message.content
+    return chat_response
 
 
 async def generate_rag_response(prompt_input: PromptInput, image_description: str) -> AsyncIterable:
@@ -81,7 +81,7 @@ async def generate_rag_response(prompt_input: PromptInput, image_description: st
 
     chat_response = run_mistral(user_message=messages)
 
-    yield chat_response.choices[0].message.content
+    yield chat_response
 
 
 @router.post("/vision-screenshot-endpoint/")

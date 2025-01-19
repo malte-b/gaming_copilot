@@ -20,7 +20,7 @@ document
         startThinking()
 
         const source = new SSE(
-            "http://localhost:5000/generate-langchain-response-endpoint",
+            "http://127.0.0.1:5000/generate-langchain-response-endpoint",
             {
                 payload: JSON.stringify({ user_message }),
                 headers: {

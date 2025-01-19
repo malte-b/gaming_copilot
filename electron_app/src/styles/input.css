@@ -136,6 +136,7 @@ body {
   padding-inline: 30px;
   padding-block: 10px;
   width: 100%;
+  background-color: white;
 }
 
 .screenshot-container.visible {

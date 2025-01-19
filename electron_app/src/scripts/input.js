@@ -17,13 +17,25 @@ document
             return;
         }
 
+        const screenshot = formData.get('screenshot')
+        const payload = { user_message }
+        if (screenshot) {
+            payload.image = screenshot
+            appendMessage(screenshot, "image-url")
+        }
+
+        // Cleanup when user submits the form
         appendMessage(user_message, "user-message")
+        event.target.reset()
+        screenshotContainer.classList.remove('visible')
+
         startThinking()
+
 
         const source = new SSE(
             "http://localhost:5000/generate-langchain-response-endpoint",
             {
-                payload: JSON.stringify({ user_message }),
+                payload: JSON.stringify(payload),
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -64,6 +76,13 @@ function appendMessage(message, type) {
     if (type === 'image-url') {
         const messageImg = document.createElement('img')
         messageImg.src = message
+        const isScreenshot = message.startsWith("data:image/png")
+        messageImg.classList.add(isScreenshot ? 'screenshot-img' : 'message-img')
+
+        if (isScreenshot) {
+            messageWrapperDiv.classList.add('reverse')
+        }
+
 
         // Appending message image to div
         messageWrapperDiv.appendChild(messageImg);

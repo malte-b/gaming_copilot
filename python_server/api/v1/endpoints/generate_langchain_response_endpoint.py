@@ -67,7 +67,7 @@ def run_mistral(user_message, model="mistral-large-latest"):
         You are a helpful, friendly and witty video game assistant for the game 'Stardew Valley'.
         Your name is 'Stardew Wizard'.
         You will receive a question from a user and some context from the 'Stardew Valley Wiki' to answer that question.
-        Anwer the user question only based on the context from the wiki.
+        Anwer the user question only based on the context from the wiki without referring to the context in your answer.
     """
     messages = [{"role": "system", "content": system_message}, {"role": "user", "content": user_message}]
     chat_response = client.chat.complete(model=model, messages=messages)

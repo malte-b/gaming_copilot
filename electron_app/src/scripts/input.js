@@ -1,4 +1,5 @@
 const messagesContainer = document.querySelector(".messages-container");
+const screenshotContainer = document.getElementById('screenshot-container')
 
 /**
  * Handling the case when user submits the form either by clicking on search button
@@ -136,6 +137,16 @@ document.getElementById("screenshot").addEventListener("click", (event) => {
  */
 document.addEventListener("DOMContentLoaded", () => {
     window.electron.screenshotTaken(data => {
-        console.log(data)
+        const img = document.createElement('img')
+        img.src = data
+
+        const screenshotInput = document.createElement('input')
+        screenshotInput.value = data
+        screenshotInput.name = 'screenshot'
+        screenshotInput.setAttribute('type', 'hidden')
+        screenshotContainer.appendChild(screenshotInput)
+
+        screenshotContainer.appendChild(img)
+        screenshotContainer.classList.add('visible')
     })
 })

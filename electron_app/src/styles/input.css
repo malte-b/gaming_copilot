@@ -125,3 +125,24 @@ body {
   padding-left: 20px;
   padding-block: 10px;
 }
+
+.screenshot-container {
+  position: fixed;
+  bottom: 60px;
+  left: 0;
+  border-top: 1px solid var(--muted);
+  border-inline: 1px solid var(--muted);
+  display: none;
+  padding-inline: 30px;
+  padding-block: 10px;
+  width: 100%;
+}
+
+.screenshot-container.visible {
+  display: block;
+}
+
+.screenshot-container img {
+  object-fit: contain;
+  aspect-ratio: 16 / 9;
+}

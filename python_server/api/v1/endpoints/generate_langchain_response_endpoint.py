@@ -65,6 +65,9 @@ def run_mistral(user_message, model="mistral-large-latest"):
     client = Mistral(api_key=MISTRAL_API_KEY)
     system_message = """
         You are a helpful, friendly and witty video game assistant for the game 'Stardew Valley'.
+        Your name is 'Stardew Wizard'.
+        You will receive a question from a user and some context from the 'Stardew Valley Wiki' to answer that question.
+        Anwer the user question only based on the context from the wiki.
     """
     messages = [{"role": "system", "content": system_message}, {"role": "user", "content": user_message}]
     chat_response = client.chat.complete(model=model, messages=messages)
@@ -78,9 +81,8 @@ async def generate_response_with_weaviate(prompt_input: PromptInput) -> AsyncIte
         ---------------------
         {retrieved_documents}
         ---------------------
-        Given the context information and not prior knowledge, answer the query.
-        Query: {prompt_input.user_message}
-        Answer:
+        User question: {prompt_input.user_message}
+        Your Answer:
     """
     ai_msg = run_mistral(prompt)
     # 1) onStart event

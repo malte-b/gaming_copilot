@@ -22,13 +22,13 @@ WEAVIATE_API_KEY = os.getenv("WEAVIATE_API_KEY")
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 
-async def retrieve_with_weaviate(prompt_input: PromptInput) -> List[Document]:
+async def retrieve_with_weaviate(prompt_input: PromptInput, image_description: str) -> List[Document]:
     # RETRIEVAL
     client = weaviate.connect_to_weaviate_cloud(
         cluster_url=WEAVIATE_URL, auth_credentials=AuthApiKey(WEAVIATE_API_KEY), headers={"X-Mistral-Api-Key": MISTRAL_API_KEY}
     )
     chunks = client.collections.get("StardewWiki")
-    retrieved_documents = chunks.query.near_text(query=prompt_input.user_message, limit=3)
+    retrieved_documents = chunks.query.near_text(query=prompt_input.user_message + "image description: " + image_description, limit=3)
     client.close()
     return retrieved_documents
 

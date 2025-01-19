@@ -11,5 +11,8 @@ contextBridge.exposeInMainWorld('electron', {
     },
     minimize: () => {
         ipcRenderer.send(IPC_EVENTS.MINIMIZE)
+    },
+    screenshot: () => {
+        ipcRenderer.send(IPC_EVENTS.SCREENSHOT)
     }
 })

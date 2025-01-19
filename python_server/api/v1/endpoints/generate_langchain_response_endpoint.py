@@ -12,6 +12,9 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from pinecone import Pinecone
 from langchain_pinecone import PineconeVectorStore
+import os
+import weaviate
+from weaviate.auth import AuthApiKey
 
 # --- internal imports
 from config import TIMEZONE, DELIMITER, mistral_small, mistral_embeddings, PINECONE_API_KEY
@@ -21,8 +24,50 @@ router = APIRouter()
 # Load environment variables from .env
 load_dotenv()
 
+WEAVIATE_URL = os.getenv("WEAVIATE_URL")
+WEAVIATE_API_KEY = os.getenv("WEAVIATE_API_KEY")
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
-async def generate_response(prompt_input: PromptInput) -> AsyncIterable[str]:
+
+async def retrieve_with_weaviate(prompt_input: PromptInput) -> List[Document]:
+    # RETRIEVAL
+    client = weaviate.connect_to_weaviate_cloud(
+        cluster_url=WEAVIATE_URL,
+        auth_credentials=AuthApiKey(WEAVIATE_API_KEY),
+        headers={
+            "X-Mistral-Api-Key": MISTRAL_API_KEY
+        }
+    )
+    chunks = client.collections.get("StardewWiki")
+    retrieved_documents = chunks.query.near_text(
+                query=prompt_input.user_message, 
+                limit=3)
+    client.close()
+    return retrieved_documents
+
+async def retrieve_with_pinecone(prompt_input: PromptInput) -> List[Document]:
+    # RETRIEVAL
+    pc = Pinecone(api_key=PINECONE_API_KEY)
+    index = pc.Index(name="gaming-copilot", host="https://gaming-copilot-mipa415.svc.aped-4627-b74a.pinecone.io")
+    vector_store = PineconeVectorStore(index=index, embedding=mistral_embeddings)
+    retrieved_documents: List[Document] = vector_store.similarity_search(
+        query=prompt_input.user_message,
+        k=3,
+        # filter={"source": "tweet"},
+    )
+    print(
+        f"""
+          Retrieved documents: 
+          {retrieved_documents}
+          """
+    )
+    return retrieved_documents
+
+async def generate_response_with_weaviate(prompt_input: PromptInput) -> AsyncIterable[str]:
+    retrieved_documents = retrieve_with_weaviate(prompt_input)
+
+
+async def generate_response_with_pinecone(prompt_input: PromptInput) -> AsyncIterable[str]:
     # RETRIEVAL
     pc = Pinecone(api_key=PINECONE_API_KEY)
     index = pc.Index(name="gaming-copilot", host="https://gaming-copilot-mipa415.svc.aped-4627-b74a.pinecone.io")
@@ -79,6 +124,9 @@ async def generate_response(prompt_input: PromptInput) -> AsyncIterable[str]:
 
 
 @router.post("/generate-langchain-response-endpoint/")
-async def generate_response_handler(body: PromptInput) -> StreamingResponse:
-    generator = generate_response(prompt_input=body)
+async def generate_response_handler(body: PromptInput, use_pinecone: bool = False) -> StreamingResponse:
+    if use_pinecone:
+        generator = generate_response_with_pinecone(prompt_input=body)
+    else:
+        generator = generate_response_with_weaviate(prompt_input=body)
     return StreamingResponse(content=generator, media_type="text/event-stream")

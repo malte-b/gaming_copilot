@@ -120,3 +120,8 @@ body {
 .search-icon {
   color: black;
 }
+
+.inline-list {
+  padding-left: 20px;
+  padding-block: 10px;
+}

@@ -54,7 +54,7 @@ app.whenReady().then(() => {
     ipcMain.on(IPC_EVENTS.TRIGGER_INPUT_WINDOW, () => {
         bubbleWindow.hide()
         inputWindow.show()
-        // inputWindow.webContents.openDevTools({ mode: 'detach' })
+        inputWindow.webContents.openDevTools({ mode: 'detach' })
     })
 
     /** Handling the event when user clicks on the minimize button */

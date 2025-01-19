@@ -20,9 +20,9 @@ document
         startThinking()
 
         const source = new SSE(
-            "http://localhost:5000/generate-langchain-response-endpoint/",
+            "http://localhost:5000/generate-langchain-response-endpoint",
             {
-                payload: JSON.stringify({ user_message }),
+                payload: JSON.stringify({ user_message, use_pinecone: true }),
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -70,7 +70,20 @@ function appendMessage(message, type) {
         messageDiv.classList.add("message");
 
         // Transforming markdown to html
-        const converter = new showdown.Converter()
+        const classMap = {
+            ul: 'ui inline-list',
+            ol: 'ui inline-list'
+        }
+
+        const bindings = Object.keys(classMap)
+            .map(key => ({
+                type: 'output',
+                regex: new RegExp(`<${key}(.*)>`, 'g'),
+                replace: `<${key} class="${classMap[key]}" $1>`
+            }));
+
+
+        const converter = new showdown.Converter({ extensions: [...bindings] })
         const html = converter.makeHtml(message);
         messageDiv.innerHTML = html;
 

@@ -1,8 +1,8 @@
 const messagesContainer = document.querySelector(".messages-container");
 const screenshotContainer = document.getElementById('screenshot-container')
 
-const SCREENSHOT_ENDPOINT = 'http://localhost:5000/vision-screenshot-endpoint/'
-const GENERAL_MESSAGE_ENDPOINT = 'http://localhost:5000/generate-langchain-response-endpoint/'
+const SCREENSHOT_ENDPOINT = 'http://127.0.0.1:5000/vision-screenshot-endpoint/'
+const GENERAL_MESSAGE_ENDPOINT = 'http://127.0.0.1:5000/generate-langchain-response-endpoint/'
 
 /**
  * Handling the case when user submits the form either by clicking on search button

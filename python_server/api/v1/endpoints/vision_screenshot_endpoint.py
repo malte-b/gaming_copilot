@@ -84,6 +84,7 @@ async def generate_rag_response(prompt_input: PromptInput, image_description: st
     chat_response = run_mistral(user_message=messages)
 
     yield f"data: {json.dumps({'type': 'onStart', 'content': 'Stream is starting!', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
+    yield f"data: {json.dumps({'type': 'onImageUrl', 'content': 'https://stardewvalleywiki.com/mediawiki/images/c/c7/Wizard.png', 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"
 
     # 2) Text event
     yield f"data: {json.dumps({'type': 'onText', 'content': chat_response, 'timestamp': datetime.now(tz=TIMEZONE).isoformat()})}{DELIMITER}"

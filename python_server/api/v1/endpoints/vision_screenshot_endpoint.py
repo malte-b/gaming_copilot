@@ -12,7 +12,7 @@ from langchain_core.documents.base import Document
 
 
 
-from config import TIMEZONE, DELIMITER, pixtral_large
+from config import pixtral_large
 
 load_dotenv()
 
@@ -51,8 +51,8 @@ def run_mistral(user_message, model="mistral-large-latest"):
     )
     return (chat_response.choices[0].message.content)
 
-def generate_vision_response(prompt_input: PromptInput, image: ImageInput) -> str:
-    base64_image = image.image
+def generate_vision_response(prompt_input: PromptInput) -> str:
+    base64_image = prompt_input.image
     messages = [
         {
             "role": "user",
@@ -100,7 +100,7 @@ async def generate_rag_response(prompt_input: PromptInput, image_description: st
     yield chat_response.choices[0].message.content
 
 @router.post("/vision-screenshot-endpoint/")
-async def generate_response_handler(body: PromptInput, image: ImageInput) -> StreamingResponse:
-    image_description = generate_vision_response(prompt_input=body, image=image)
+async def generate_response_handler(body: PromptInput) -> StreamingResponse:
+    image_description = generate_vision_response(prompt_input=body)
     rag_response = generate_rag_response(prompt_input=body, image_description=image_description)
     return StreamingResponse(content=rag_response, media_type="text/event-stream")
